@@ -1,12 +1,16 @@
 class Pokemon_card:
-  def __init__(self, name, level, current_exp, attribute, max_health, health, knocked_out):
+  def __init__(self, name, level, current_exp, pok_type, max_health, health, knocked_out = False):
     self.name = name
     self.level = level
     self.current_exp = current_exp
-    self.attribute = attribute
+    self.pok_type = pok_type
     self.max_health = max_health
     self.health = health
     self.knocked_out = knocked_out
+
+  def basic_stats(self):
+    if self.knocked_out == False:
+      print("{name} is now level {num1} and its type is {type1}. It's current HP is {num2}.")
   
   def dec_health(self, amount):
     self.health -= amount
@@ -49,40 +53,40 @@ class Pokemon_card:
       print("{name} is already being knocked out and can't be attacked.".format(name = opponent.name))
       return
     damage = 0
-    if self.type == "Water":
-      if opponent.type == "Fire":
+    if self.pok_type == "Water":
+      if opponent.pok_type == "Fire":
         damage = 2 * self.level
-      elif opponent.type == "Water" or opponent.type == "Grass":
+      elif opponent.pok_type == "Water" or opponent.pok_type == "Grass":
         damage = 0.5 * self.level
-      elif opponent.type == "Electric" or opponent.type == "Ice":
+      elif opponent.pok_type == "Electric" or opponent.pok_type == "Ice":
         damage = self.level
-    elif self.type == "Fire":
-      if opponent.type == "Fire" or opponent.type == "Water":
+    elif self.pok_type == "Fire":
+      if opponent.pok_type == "Fire" or opponent.pok_type == "Water":
         damage = 0.5 * self.level
-      elif opponent.type == "Grass" or opponent.type == "Ice":
+      elif opponent.pok_type == "Grass" or opponent.pok_type == "Ice":
         damage = 2 * self.level
-      elif opponent.type == "Electric":
+      elif opponent.pok_type == "Electric":
         damage = self.level
-    elif self.type == "Electric":
-      if opponent.type == "Electric" or opponent.type == "Grass":
+    elif self.pok_type == "Electric":
+      if opponent.pok_type == "Electric" or opponent.pok_type == "Grass":
         damage = 0.5 * self.level
-      elif opponent.type == "Water":
+      elif opponent.pok_type == "Water":
         damage = 2 * self.level
-      elif opponent.type == "Fire" or opponent.type == "Ice":
+      elif opponent.pok_type == "Fire" or opponent.pok_type == "Ice":
         damage = self.level
-    elif self.type == "Grass":
-      if opponent.type == "Fire" or opponent.type == "Grass":
+    elif self.pok_type == "Grass":
+      if opponent.pok_type == "Fire" or opponent.pok_type == "Grass":
         damage = 0.5 * self.level
-      elif opponent.type == "Water":
+      elif opponent.pok_type == "Water":
         damage = 2 * self.level
-      elif opponent.type == "Electric" or opponent.type == "Ice":
+      elif opponent.pok_type == "Electric" or opponent.pok_type == "Ice":
         damage = self.level
-    elif self.type == "Ice":
-      if opponent.type == "Fire" or opponent.type == "Water" or opponent.type == "Ice":
+    elif self.pok_type == "Ice":
+      if opponent.pok_type == "Fire" or opponent.pok_type == "Water" or opponent.pok_type == "Ice":
         damage = 0.5 * self.level
-      elif opponent.type == "Grass":
+      elif opponent.pok_type == "Grass":
         damage = 2 * self.level
-      elif opponent.type == "Electric" or opponent.type == "Ice":
+      elif opponent.pok_type == "Electric" or opponent.pok_type == "Ice":
         damage = self.level
     print("Your {name1} caused {num} damage to opponent's {name2}!".format(name1 = self.name, num = damage, name2 = opponent.name))
     opponent.health -= damage
@@ -91,7 +95,7 @@ class Pokemon_card:
       opponent.health = 0
       opponent.is_knocked = True
       self.current_exp += 50
-      print("The opponent's {name1} has been knocked out bu your {name2}. Your {name2} has gained 50 EXP. Congratulations!".format(name1 = opponent.name, name2 = self.name))
+      print("The opponent's {name1} has been knocked out by your {name2}. Your {name2} has gained 50 EXP. Congratulations!".format(name1 = opponent.name, name2 = self.name))
     else:
       print("Opponent's {name} now has {num} HP.".format(name = opponent.name, num = opponent.health))
     if self.current_exp >= 100:
@@ -106,6 +110,14 @@ class Trainer:
     self.potions = potions
     self.current_pokemon = current_pokemon
     self.name = name
+
+  def current_info(self):
+    print("{name} now has {num} potions left, ".format(name = self.name, num = self.potions) + "and his/her current available pokemon is {name1}.".format(name1 = self.current_pokemon.name))
+    print("{name}'s list of available (not knocked out yet) pokemons are: ".format(name = self.name))
+    for temp in self.pokemons:
+      if temp.knocked_out == False:
+        print(temp.name)
+
   
   def use_potion(self):
     if self.potions == 0:
@@ -126,8 +138,32 @@ class Trainer:
       if temp == new_pokemon:
         self.current_pokemon = new_pokemon
         print("{name1} has successfully switched his/her active pokemon into {name2}.".format(name1 = self.name, name2 = new_pokemon.name))
-    
-from replit import db
+        return
+    print("The pokemon that you input is not contained in your list of pokemons. Please enter a pokemon that is in your list!")
+
+  def trainer_attack(self, rival):
+    self.current_pokemon.attack(rival.current_pokemon)
+    #print("{name1}'s pokemon {name2} has attacked {name3}!".format(name1 = self.name, name2 = self.current_pokemon.name, name3 = rival.current_pokemon.name))
+
+jigg = Pokemon_card("jigglypuff", 2, 0, "Fire", 20, 20)
+pikachu = Pokemon_card("pikachu", 3, 0, "Electric", 30, 30)
+meowf = Pokemon_card("meowf", 2, 0, "Grass", 29, 29)
+spiff = Pokemon_card("spiffamungus", 3, 0, "Ice", 40, 40)
+trainer_1 = Trainer([jigg, pikachu, meowf, spiff], 10, pikachu, 'Sam')
+trainer_2 = Trainer([jigg, meowf, spiff], 10, jigg, 'Lucy')
+trainer_1.current_info()
+trainer_2.current_info()
+trainer_1.trainer_attack(trainer_2)
+trainer_2.trainer_attack(trainer_1)
+trainer_1.switch_pokemon(meowf)
+trainer_2.switch_pokemon(spiff)
+
+#pikachu.dec_health(29)
+#jigg.dec_health(17)
+#meowf.dec_health(27.5)
+#pikachu.attack(spiff)
+#pikachu.attack(jigg)
+#pikachu.attack(meowf)
 
     
   
